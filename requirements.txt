@@ -1,0 +1,9 @@
+flask
+flask-cors
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+fpdf2
+python-dotenv
+pillow

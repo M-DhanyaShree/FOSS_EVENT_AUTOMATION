@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOSS-CIT EMS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <nav>
+        <div class="logo">
+            <i data-lucide="calendar"></i> FOSS-CIT EMS
+        </div>
+        <div id="nav-actions">
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard View -->
+        <div id="dashboard-view">
+            <div class="dashboard-header">
+                <div>
+                    <h1>Event Dashboard</h1>
+                    <p style="color: var(--text-secondary); margin-top: 10px;">Event Management & Automation</p>
+                </div>
+                <button class="btn btn-primary" onclick="openModal('createEventModal')">
+                    <i data-lucide="plus"></i> New Event
+                </button>
+            </div>
+
+            <div id="event-grid">
+                <!-- Event cards added here -->
+            </div>
+        </div>
+
+        <!-- Event Detail View (Terminal Window) -->
+        <div id="event-detail-view" style="display: none;">
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div style="display: flex; gap: 8px;">
+                        <div class="dot dot-red"></div>
+                        <div class="dot dot-yellow"></div>
+                        <div class="dot dot-green"></div>
+                    </div>
+                    <div
+                        style="margin-left: 20px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--text-secondary);">
+                        Current Event Data
+                    </div>
+                    <div style="flex-grow: 1; text-align: right;">
+                        <button class="btn btn-outline" style="display: inline-flex; border: none;"
+                            onclick="openEditDetails()">
+                            <i data-lucide="edit-3"></i> Edit Details
+                        </button>
+                    </div>
+                </div>
+                <div class="terminal-body">
+                    <div id="detail-header" style="margin-bottom: 2rem;">
+                        <h1 id="disp-name" style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">
+                            EVENT_NAME</h1>
+                        <p id="disp-mode"
+                            style="color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; font-size: 1.1rem;">
+                            Mode: Offline</p>
+                    </div>
+
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('details')">.event_info</div>
+                        <div class="tab" onclick="switchTab('budget')">.budget_calc</div>
+                        <div class="tab" onclick="switchTab('tasks')">.task_tracker</div>
+                        <div class="tab" onclick="switchTab('resources')">.resources_drive</div>
+                    </div>
+
+                    <!-- Details Tab -->
+                    <div id="tab-details" class="tab-content">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <h4>VENUE</h4>
+                                <p id="disp-venue">-</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>TIME</h4>
+                                <p id="disp-time">-</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>PARTICIPANTS</h4>
+                                <p id="disp-participants">0</p>
+                            </div>
+                            <div class="info-item">
+                                <h4>TYPE</h4>
+                                <p id="disp-type">-</p>
+                            </div>
+                        </div>
+                        <div class="info-item" style="margin-bottom: 2rem;">
+                            <h4>DESCRIPTION</h4>
+                            <p id="disp-description" style="line-height: 1.6; color: var(--text-secondary);">No
+                                description provided.</p>
+                        </div>
+
+                        <div class="section-header"
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Event Flow /
+                                Rounds</h3>
+                            <button class="btn btn-outline" onclick="openModal('addFlowModal')"><i
+                                    data-lucide="plus"></i> Add Round</button>
+                        </div>
+                        <table id="flow-list"></table>
+                    </div>
+
+                    <!-- Budget Tab -->
+                    <div id="tab-budget" class="tab-content" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Budget Summary
+                            </h3>
+                            <button class="btn btn-primary" onclick="openModal('addBudgetModal')"><i
+                                    data-lucide="plus"></i> Add Item</button>
+                        </div>
+                        <table id="budget-list"></table>
+                    </div>
+
+                    <!-- Tasks Tab -->
+                    <div id="tab-tasks" class="tab-content" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Task List</h3>
+                            <button class="btn btn-primary" onclick="openModal('addTaskModal')"><i
+                                    data-lucide="plus"></i> Add Task</button>
+                        </div>
+                        <table id="task-list"></table>
+                    </div>
+
+                    <!-- Resources Tab -->
+                    <div id="tab-resources" class="tab-content" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
+                            <h3 style="color: var(--accent); font-family: 'JetBrains Mono', monospace;">Resource Files
+                            </h3>
+                            <button class="btn btn-primary" onclick="openModal('uploadModal')"><i
+                                    data-lucide="upload"></i> Upload</button>
+                        </div>
+                        <table id="resource-list"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button class="btn btn-primary" onclick="openModal('reportPromptModal')" style="padding: 1rem 2rem;">
+                    <i data-lucide="file-text"></i> Generate Report
+                </button>
+                <button class="btn btn-delete" onclick="deleteCurrentEvent()" style="padding: 1rem 2rem;">
+                    <i data-lucide="trash-2"></i> Delete Event
+                </button>
+                <button class="btn btn-outline" onclick="showDashboard()"
+                    style="padding: 1rem 2rem; margin-left: auto;">
+                    <i data-lucide="arrow-left"></i> Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <h2 style="font-family: 'JetBrains Mono', monospace; color: var(--accent); margin-bottom: 1.5rem;">New Event
+            </h2>
+            <div class="form-group">
+                <label>Event Name</label>
+                <input type="text" id="event-name" placeholder="e.g. hack_n_hunt">
+            </div>
+            <div class="form-group">
+                <label>Mode</label>
+                <select id="event-mode">
+                    <option value="Offline">Offline</option>
+                    <option value="Online">Online</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('createEventModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="createEventSubmit()">Create Event</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addFlowModal" class="modal">
+        <div class="modal-content">
+            <h2>Add Round</h2>
+            <div class="form-group"><label>Round Name</label><input type="text" id="round-name"></div>
+            <div class="form-group"><label>Date-Time</label><input type="datetime-local" id="round-time"></div>
+            <div class="form-group"><label>Description</label><textarea id="round-desc"></textarea></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('addFlowModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addFlowSubmit()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addBudgetModal" class="modal">
+        <div class="modal-content">
+            <h2>Budget Item</h2>
+            <div class="form-group"><label>Item Name</label><input type="text" id="budget-item"></div>
+            <div class="form-group"><label>Cost (INR)</label><input type="number" id="budget-cost"></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('addBudgetModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addBudgetSubmit()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <h2>New Task</h2>
+            <div class="form-group"><label>Task Title</label><input type="text" id="task-title"></div>
+            <div class="form-group"><label>Assign To</label><input type="text" id="task-assignee"></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('addTaskModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addTaskSubmit()">Assign</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <h2>Upload Resource</h2>
+            <div class="form-group">
+                <label>Category</label>
+                <select id="res-category">
+                    <option value="Poster">Poster (Image Only)</option>
+                    <option value="Picture">Event Photo (For Snapshot)</option>
+                    <option value="Video">YouTube/Video Link</option>
+                    <option value="Bill">Bill/Receipt (Budget)</option>
+                    <option value="Document">General Resource</option>
+                    <option value="Content">Content Files</option>
+                </select>
+            </div>
+            <div id="res-file-group" class="form-group">
+                <label>File</label>
+                <input type="file" id="res-file">
+            </div>
+            <div id="res-link-group" class="form-group" style="display: none;">
+                <label>Link URL</label>
+                <input type="text" id="res-link" placeholder="https://...">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('uploadModal')">Cancel</button>
+                <button class="btn btn-primary" id="upload-btn" onclick="uploadResourceSubmit()">Upload_File</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="editDetailsModal" class="modal">
+        <div class="modal-content">
+            <h2>Modify Details</h2>
+            <div class="form-group"><label>Venue</label><input type="text" id="edit-venue"></div>
+            <div class="form-group"><label>Time/Date</label><input type="text" id="edit-time"></div>
+            <div class="form-group"><label>Type/Category</label><input type="text" id="edit-type"></div>
+            <div class="form-group"><label>Expected Participants</label><input type="number" id="edit-participants">
+            </div>
+            <div class="form-group"><label>Organizers</label><textarea id="edit-organizers" rows="3"></textarea></div>
+            <div class="form-group"><label>Description</label><textarea id="edit-description" rows="4"></textarea></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('editDetailsModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="updateDetailsSubmit()">Save_Config</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reportPromptModal" class="modal">
+        <div class="modal-content">
+            <h2>Report Config</h2>
+            <p style="margin-bottom: 20px;">Provide an optional link (e.g. YouTube) to include in the report.</p>
+            <div class="form-group"><label>Link Label</label><input type="text" id="rep-label" value="Youtube Link">
+            </div>
+            <div class="form-group"><label>URL</label><input type="text" id="rep-url"
+                    placeholder="https://youtube.com/..."></div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button class="btn btn-outline" onclick="closeModal('reportPromptModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="genReportSubmit()">Generate_PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+
+</html>

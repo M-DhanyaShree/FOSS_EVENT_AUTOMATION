@@ -1,0 +1,30 @@
+# Credentials and Secrets
+drive_integration/*.json
+drive_integration/*.pickle
+.env
+
+# Database
+database/*.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary Files and Logs
+*.log
+*.tmp
+temp/
+utils/temp/
+reports/
+*.pdf
+
+# Environment
+venv/
+.venv/
+env/
+
+# OS Files
+.DS_Store
+Thumbs.db
